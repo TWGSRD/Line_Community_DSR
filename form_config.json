@@ -1,0 +1,54 @@
+{
+  "title": "亞馬遜業務聯繫表單",
+  "fields": [
+    {
+      "name": "question1",
+      "label": "公司名稱",
+      "type": "text",
+      "required": true,
+      "options": []
+    },
+    {
+      "name": "question2",
+      "label": "聯絡人姓名",
+      "type": "text",
+      "required": true,
+      "options": []
+    },
+    {
+      "name": "question3",
+      "label": "聯絡電話(手機)",
+      "type": "tel",
+      "required": true,
+      "options": []
+    },
+    {
+      "name": "question4",
+      "label": "Line ID (亞馬遜人員會協助聯繫您的業務經理與您建立Line群組)",
+      "type": "text",
+      "required": true,
+      "options": []
+    },
+    {
+      "name": "question5",
+      "label": "請問您要使用的【註冊信箱】 填寫後亞馬遜人員會直接*發送連結*到您這個信箱並協助建立Line 群組後續溝通",
+      "type": "email",
+      "required": true,
+      "options": []
+    },
+    {
+      "name": "question6",
+      "label": "請問對於開設哪一個亞馬遜站點有興趣?",
+      "type": "select",
+      "required": true,
+      "options": [
+        "美國站點 (Amazon.com)",
+        "歐洲站點 (Amazon.co.uk, Amazon.de, Amazon.fr, Amazon.it, Amazon.es)",
+        "日本站點 (Amazon.co.jp)",
+        "加拿大站點 (Amazon.ca)",
+        "澳洲站點 (Amazon.com.au)",
+        "多個站點"
+      ]
+    }
+  ]
+}

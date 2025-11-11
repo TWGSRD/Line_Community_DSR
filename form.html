@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>群組表單</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 50px auto; padding: 20px; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input, select, textarea { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
+        button { background: #007cba; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; margin: 5px; }
+        button:hover { background: #005a87; }
+        .success { color: green; margin-top: 10px; }
+        .error { color: red; margin-top: 10px; }
+        .admin-btn { float: right; font-size: 12px; padding: 5px 10px; }
+        .panel { background: #f0f0f0; padding: 15px; margin-bottom: 20px; border-radius: 5px; }
+        .config-panel { background: #d1ecf1; }
+        .login-panel { background: #fff3cd; }
+        .field-config { border: 1px solid #ccc; padding: 10px; margin: 10px 0; border-radius: 5px; }
+        table { width: 100%; border-collapse: collapse; margin: 10px 0; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        .data-table { max-height: 400px; overflow-y: auto; }
+    </style>
+</head>
+<body>
+    <div id="loginForm" class="panel login-panel" style="display:none;">
+        <h3>管理者登入</h3>
+        <div class="form-group">
+            <input type="password" id="adminPassword" placeholder="請輸入管理者密碼">
+        </div>
+        <button type="button" onclick="adminLogin()">登入</button>
+        <button type="button" onclick="showUserForm()">返回表單</button>
+        <div id="loginMessage"></div>
+    </div>
+
+    <div id="adminPanel" class="panel" style="display:none;">
+        <h3>管理者面板</h3>
+        <button type="button" onclick="showConfigPanel()">編輯表單問題</button>
+        <button type="button" onclick="showDataPanel()">瀏覽提交資料</button>
+        <button type="button" onclick="downloadExcel()">下載Excel檔案</button>
+        <button type="button" onclick="saveFormData()">存檔資料</button>
+        <button type="button" onclick="hideAdmin()">返回表單</button>
+    </div>
+
+    <div id="dataPanel" class="panel" style="display:none;">
+        <h3>提交資料瀏覽</h3>
+        <div id="dataTable"></div>
+        <button type="button" onclick="refreshData()">重新整理</button>
+        <button type="button" onclick="hideDataPanel()">返回</button>
+    </div>
+
+    <div id="configPanel" class="panel config-panel" style="display:none;">
+        <h3>編輯表單設定</h3>
+        <div class="form-group">
+            <label>表單標題：</label>
+            <input type="text" id="formTitle" value="群組資料填寫表單">
+        </div>
+        
+        <div class="field-config">
+            <h4>問題 1</h4>
+            <label>標題：</label>
+            <input type="text" id="field0_label" value="">
+            <label>類型：</label>
+            <select id="field0_type" onchange="toggleOptions(0)">
+                <option value="text">文字</option>
+                <option value="email">電子郵件</option>
+                <option value="tel">電話</option>
+                <option value="select">選擇</option>
+                <option value="textarea">多行文字</option>
+            </select>
+            <label>必填：</label>
+            <input type="checkbox" id="field0_required" checked>
+            <div id="options0" style="display:none;">
+                <label>選項（每行一個）：</label>
+                <textarea id="field0_options"></textarea>
+            </div>
+        </div>
+
+        <div class="field-config">
+            <h4>問題 2</h4>
+            <label>標題：</label>
+            <input type="text" id="field1_label" value="">
+            <label>類型：</label>
+            <select id="field1_type" onchange="toggleOptions(1)">
+                <option value="text">文字</option>
+                <option value="email">電子郵件</option>
+                <option value="tel">電話</option>
+                <option value="select">選擇</option>
+                <option value="textarea">多行文字</option>
+            </select>
+            <label>必填：</label>
+            <input type="checkbox" id="field1_required" checked>
+            <div id="options1" style="display:none;">
+                <label>選項（每行一個）：</label>
+                <textarea id="field1_options"></textarea>
+            </div>
+        </div>
+
+        <div class="field-config">
+            <h4>問題 3</h4>
+            <label>標題：</label>
+            <input type="text" id="field2_label" value="">
+            <label>類型：</label>
+            <select id="field2_type" onchange="toggleOptions(2)">
+                <option value="text">文字</option>
+                <option value="email">電子郵件</option>
+                <option value="tel">電話</option>
+                <option value="select">選擇</option>
+                <option value="textarea">多行文字</option>
+            </select>
+            <label>必填：</label>
+            <input type="checkbox" id="field2_required" checked>
+            <div id="options2" style="display:none;">
+                <label>選項（每行一個）：</label>
+                <textarea id="field2_options"></textarea>
+            </div>
+        </div>
+
+        <div class="field-config">
+            <h4>問題 4</h4>
+            <label>標題：</label>
+            <input type="text" id="field3_label" value="">
+            <label>類型：</label>
+            <select id="field3_type" onchange="toggleOptions(3)">
+                <option value="text">文字</option>
+                <option value="email">電子郵件</option>
+                <option value="tel">電話</option>
+                <option value="select">選擇</option>
+                <option value="textarea">多行文字</option>
+            </select>
+            <label>必填：</label>
+            <input type="checkbox" id="field3_required" checked>
+            <div id="options3" style="display:none;">
+                <label>選項（每行一個）：</label>
+                <textarea id="field3_options"></textarea>
+            </div>
+        </div>
+
+        <div class="field-config">
+            <h4>問題 5</h4>
+            <label>標題：</label>
+            <input type="text" id="field4_label" value="">
+            <label>類型：</label>
+            <select id="field4_type" onchange="toggleOptions(4)">
+                <option value="text">文字</option>
+                <option value="email">電子郵件</option>
+                <option value="tel">電話</option>
+                <option value="select">選擇</option>
+                <option value="textarea">多行文字</option>
+            </select>
+            <label>必填：</label>
+            <input type="checkbox" id="field4_required" checked>
+            <div id="options4" style="display:none;">
+                <label>選項（每行一個）：</label>
+                <textarea id="field4_options"></textarea>
+            </div>
+        </div>
+
+        <div class="field-config">
+            <h4>問題 6</h4>
+            <label>標題：</label>
+            <input type="text" id="field5_label" value="">
+            <label>類型：</label>
+            <select id="field5_type" onchange="toggleOptions(5)">
+                <option value="text">文字</option>
+                <option value="email">電子郵件</option>
+                <option value="tel">電話</option>
+                <option value="select">選擇</option>
+                <option value="textarea">多行文字</option>
+            </select>
+            <label>必填：</label>
+            <input type="checkbox" id="field5_required" checked>
+            <div id="options5" style="display:none;">
+                <label>選項（每行一個）：</label>
+                <textarea id="field5_options"></textarea>
+            </div>
+        </div>
+
+        <button type="button" onclick="saveConfig()">送出</button>
+        <button type="button" onclick="hideConfigPanel()">返回</button>
+        <div id="configMessage"></div>
+    </div>
+
+    <h2 id="formTitleDisplay">群組資料填寫表單 
+        <button type="button" class="admin-btn" onclick="showAdmin()">管理者</button>
+    </h2>
+    
+    <form id="dataForm">
+        <div id="formFields">
+            <!-- 動態生成表單欄位 -->
+        </div>
+        <button type="submit">提交表單</button>
+        <div id="message"></div>
+    </form>
+
+    <script>
+        let formConfig = {};
+
+        // 載入表單配置
+        function loadFormConfig() {
+            fetch('/get-config')
+            .then(response => response.json())
+            .then(config => {
+                formConfig = config;
+                document.getElementById('formTitleDisplay').innerHTML = 
+                    config.title + ' <button type="button" class="admin-btn" onclick="showAdmin()">管理者</button>';
+                document.getElementById('formTitle').value = config.title;
+                
+                // 載入6個問題到編輯區
+                for (let i = 0; i < 6; i++) {
+                    const field = config.fields[i] || {name: `question${i+1}`, label: `問題${i+1}`, type: 'text', required: true, options: []};
+                    document.getElementById(`field${i}_label`).value = field.label;
+                    document.getElementById(`field${i}_type`).value = field.type;
+                    document.getElementById(`field${i}_required`).checked = field.required;
+                    document.getElementById(`field${i}_options`).value = (field.options || []).join('\n');
+                    toggleOptions(i);
+                }
+                
+                generateForm();
+            })
+            .catch(error => {
+                console.error('載入配置失敗:', error);
+                // 使用預設配置
+                formConfig = {
+                    "title": "亞馬遜業務聯繫表單",
+                    "fields": [
+                        {"name": "question1", "label": "公司名稱", "type": "text", "required": true, "options": []},
+                        {"name": "question2", "label": "聯絡人姓名", "type": "text", "required": true, "options": []},
+                        {"name": "question3", "label": "聯絡電話(手機)", "type": "tel", "required": true, "options": []},
+                        {"name": "question4", "label": "Line ID (亞馬遜人員會協助聯繫您的業務經理與您建立Line群組)", "type": "text", "required": true, "options": []},
+                        {"name": "question5", "label": "請問您要使用的【註冊信箱】 填寫後亞馬遜人員會直接*發送連結*到您這個信箱並協助建立Line 群組後續溝通", "type": "email", "required": true, "options": []},
+                        {"name": "question6", "label": "請問對於開設哪一個亞馬遜站點有興趣?", "type": "select", "required": true, "options": ["美國站點 (Amazon.com)", "歐洲站點 (Amazon.co.uk, Amazon.de, Amazon.fr, Amazon.it, Amazon.es)", "日本站點 (Amazon.co.jp)", "加拿大站點 (Amazon.ca)", "澳洲站點 (Amazon.com.au)", "多個站點"]}
+                    ]
+                };
+                document.getElementById('formTitleDisplay').innerHTML = 
+                    formConfig.title + ' <button type="button" class="admin-btn" onclick="showAdmin()">管理者</button>';
+                document.getElementById('formTitle').value = formConfig.title;
+                generateForm();
+            });
+        }
+
+        function toggleOptions(index) {
+            const type = document.getElementById(`field${index}_type`).value;
+            const optionsDiv = document.getElementById(`options${index}`);
+            optionsDiv.style.display = type === 'select' ? 'block' : 'none';
+        }
+
+        function saveConfig() {
+            formConfig.title = document.getElementById('formTitle').value;
+            formConfig.fields = [];
+            
+            // 收集6個問題的設定
+            for (let i = 0; i < 6; i++) {
+                const field = {
+                    name: `question${i+1}`,
+                    label: document.getElementById(`field${i}_label`).value,
+                    type: document.getElementById(`field${i}_type`).value,
+                    required: document.getElementById(`field${i}_required`).checked,
+                    options: document.getElementById(`field${i}_options`).value.split('\n').filter(opt => opt.trim())
+                };
+                formConfig.fields.push(field);
+            }
+            
+            fetch('/save-config', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(formConfig)
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.success) {
+                    document.getElementById('configMessage').innerHTML = '<div class="success">表單設定已送出並儲存！</div>';
+                    loadFormConfig();
+                    setTimeout(() => {
+                        document.getElementById('configMessage').innerHTML = '';
+                    }, 3000);
+                } else {
+                    document.getElementById('configMessage').innerHTML = '<div class="error">送出失敗</div>';
+                }
+            });
+        }
+
+        // 生成表單
+        function generateForm() {
+            const container = document.getElementById('formFields');
+            container.innerHTML = '';
+            
+            formConfig.fields.forEach(field => {
+                const div = document.createElement('div');
+                div.className = 'form-group';
+                
+                const label = document.createElement('label');
+                label.textContent = field.label + '：';
+                label.setAttribute('for', field.name);
+                div.appendChild(label);
+                
+                let input;
+                if (field.type === 'select') {
+                    input = document.createElement('select');
+                    const defaultOption = document.createElement('option');
+                    defaultOption.value = '';
+                    defaultOption.textContent = '請選擇';
+                    input.appendChild(defaultOption);
+                    
+                    const options = field.options || [];
+                    options.forEach(option => {
+                        const opt = document.createElement('option');
+                        opt.value = option;
+                        opt.textContent = option;
+                        input.appendChild(opt);
+                    });
+                } else if (field.type === 'textarea') {
+                    input = document.createElement('textarea');
+                    input.rows = 4;
+                } else {
+                    input = document.createElement('input');
+                    input.type = field.type;
+                }
+                
+                input.id = field.name;
+                input.name = field.name;
+                if (field.required) input.required = true;
+                
+                div.appendChild(input);
+                container.appendChild(div);
+            });
+        }
+
+        function saveConfig() {
+            formConfig.title = document.getElementById('formTitle').value;
+            
+            fetch('/save-config', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(formConfig)
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.success) {
+                    document.getElementById('configMessage').innerHTML = '<div class="success">表單設定已儲存！</div>';
+                    loadFormConfig();
+                    setTimeout(() => {
+                        document.getElementById('configMessage').innerHTML = '';
+                    }, 3000);
+                } else {
+                    document.getElementById('configMessage').innerHTML = '<div class="error">儲存失敗</div>';
+                }
+            });
+        }
+
+        function showAdmin() {
+            document.getElementById('loginForm').style.display = 'block';
+            document.getElementById('dataForm').style.display = 'none';
+            document.getElementById('adminPassword').value = '';
+            document.getElementById('loginMessage').innerHTML = '';
+        }
+
+        function showUserForm() {
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('dataForm').style.display = 'block';
+        }
+
+        function adminLogin() {
+            const password = document.getElementById('adminPassword').value;
+            if (!password) {
+                document.getElementById('loginMessage').innerHTML = '<div class="error">請輸入密碼</div>';
+                return;
+            }
+
+            fetch('/admin-login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ password: password })
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.success) {
+                    document.getElementById('adminPanel').style.display = 'block';
+                    document.getElementById('loginForm').style.display = 'none';
+                    document.getElementById('dataForm').style.display = 'block';
+                    document.getElementById('loginMessage').innerHTML = '';
+                } else {
+                    document.getElementById('loginMessage').innerHTML = '<div class="error">密碼錯誤</div>';
+                }
+            })
+            .catch(error => {
+                document.getElementById('loginMessage').innerHTML = '<div class="error">登入失敗，請重試</div>';
+            });
+        }
+
+        function hideAdmin() {
+            document.getElementById('adminPanel').style.display = 'none';
+            document.getElementById('dataForm').style.display = 'block';
+            document.getElementById('configPanel').style.display = 'none';
+        }
+
+        function showConfigPanel() {
+            document.getElementById('configPanel').style.display = 'block';
+            document.getElementById('dataForm').style.display = 'none';
+        }
+
+        function hideConfigPanel() {
+            document.getElementById('configPanel').style.display = 'none';
+            document.getElementById('dataForm').style.display = 'block';
+        }
+
+        function showDataPanel() {
+            document.getElementById('dataPanel').style.display = 'block';
+            document.getElementById('dataForm').style.display = 'none';
+            loadSubmittedData();
+        }
+
+        function hideDataPanel() {
+            document.getElementById('dataPanel').style.display = 'none';
+            document.getElementById('dataForm').style.display = 'block';
+        }
+
+        function loadSubmittedData() {
+            fetch('/get-data')
+            .then(response => response.json())
+            .then(data => {
+                displayDataTable(data);
+            })
+            .catch(error => {
+                document.getElementById('dataTable').innerHTML = '<p class="error">載入資料失敗</p>';
+            });
+        }
+
+        function displayDataTable(data) {
+            const container = document.getElementById('dataTable');
+            
+            if (!data || data.length === 0) {
+                container.innerHTML = '<p>目前沒有提交資料</p>';
+                return;
+            }
+
+            let html = '<div class="data-table"><table><thead><tr>';
+            html += '<th>提交時間</th>';
+            html += '<th>公司名稱</th>';
+            html += '<th>聯絡人姓名</th>';
+            html += '<th>聯絡電話</th>';
+            html += '<th>Line ID</th>';
+            html += '<th>註冊信箱</th>';
+            html += '<th>站點興趣</th>';
+            html += '</tr></thead><tbody>';
+
+            data.forEach(record => {
+                html += '<tr>';
+                html += `<td>${record.timestamp || ''}</td>`;
+                html += `<td>${record.question1 || ''}</td>`;
+                html += `<td>${record.question2 || ''}</td>`;
+                html += `<td>${record.question3 || ''}</td>`;
+                html += `<td>${record.question4 || ''}</td>`;
+                html += `<td>${record.question5 || ''}</td>`;
+                html += `<td>${record.question6 || ''}</td>`;
+                html += '</tr>';
+            });
+
+            html += '</tbody></table></div>';
+            container.innerHTML = html;
+        }
+
+        function refreshData() {
+            loadSubmittedData();
+        }
+
+        function saveFormData() {
+            fetch('/save-data', {
+                method: 'POST'
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.success) {
+                    alert('✅ 資料已成功存檔！\n檔案名稱: ' + result.filename);
+                } else {
+                    alert('❌ 存檔失敗: ' + (result.message || '未知錯誤'));
+                }
+            })
+            .catch(error => {
+                alert('❌ 存檔失敗: 網路錯誤');
+            });
+        }
+
+        // 載入配置
+        document.addEventListener('DOMContentLoaded', function() {
+            loadFormConfig();
+            
+            // 按Enter鍵登入
+            document.getElementById('adminPassword').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    adminLogin();
+                }
+            });
+        });
+
+        function refreshData() {
+            loadSubmittedData();
+        }
+
+        function downloadExcel() {
+            window.open('/download', '_blank');
+        }
+
+        document.getElementById('dataForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // 檢查服務器是否運行
+            fetch('/get-config')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('服務器未運行');
+                }
+                
+                // 服務器正常，提交表單
+                const formData = new FormData(document.getElementById('dataForm'));
+                const data = Object.fromEntries(formData);
+                data.timestamp = new Date().toLocaleString('zh-TW');
+                
+                console.log('提交資料:', data);
+                
+                return fetch('/submit', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+            })
+            .then(response => {
+                console.log('回應狀態:', response.status);
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(result => {
+                console.log('回應結果:', result);
+                if (result.status === 'success') {
+                    document.getElementById('message').innerHTML = '<div class="success">✅ 提交成功！資料已儲存</div>';
+                    document.getElementById('dataForm').reset();
+                    setTimeout(() => {
+                        document.getElementById('message').innerHTML = '';
+                    }, 3000);
+                } else {
+                    document.getElementById('message').innerHTML = '<div class="error">❌ 提交失敗：' + (result.message || '未知錯誤') + '</div>';
+                }
+            })
+            .catch(error => {
+                console.error('提交錯誤:', error);
+                if (error.message.includes('服務器未運行') || error.message.includes('Failed to fetch')) {
+                    document.getElementById('message').innerHTML = '<div class="error">❌ 無法連接服務器，請確認服務器是否正在運行</div>';
+                } else {
+                    document.getElementById('message').innerHTML = '<div class="error">❌ 提交失敗：' + error.message + '</div>';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
