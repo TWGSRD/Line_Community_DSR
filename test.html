@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>測試提交</title>
+</head>
+<body>
+    <h2>測試表單提交</h2>
+    <form id="testForm">
+        <input type="text" name="test" value="測試資料" required>
+        <button type="submit">測試提交</button>
+    </form>
+    <div id="result"></div>
+
+    <script>
+        document.getElementById('testForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const data = {
+                question1: "測試公司",
+                question2: "測試姓名", 
+                question3: "0912345678",
+                question4: "testline",
+                question5: "test@email.com",
+                question6: "美國站點 (Amazon.com)",
+                timestamp: new Date().toLocaleString('zh-TW')
+            };
+            
+            fetch('/submit', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.text())
+            .then(text => {
+                document.getElementById('result').innerHTML = `<p>回應: ${text}</p>`;
+            })
+            .catch(error => {
+                document.getElementById('result').innerHTML = `<p>錯誤: ${error}</p>`;
+            });
+        });
+    </script>
+</body>
+</html>
